@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yuyang Deng · Genomics &amp; Neuroscience</title>
+    <meta
+      name="description"
+      content="Yuyang Deng — CS &amp; Biostatistics at UNC Chapel Hill, working from the single-cell genome to the rhythms of the brain."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <header class="nav">
+      <a class="nav__brand" href="#top" aria-label="Home">
+        <span class="nav__mark" aria-hidden="true"></span>
+        <span class="nav__initials">Yuyang Deng</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#research">Research</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#awards">Awards</a>
+        <a href="#contact">Contact</a>
+        <a class="nav__cv" href="cv.pdf" target="_blank" rel="noopener">CV</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <main id="top">
+      <section class="hero">
+        <canvas class="hero__canvas" id="strandCanvas" aria-hidden="true"></canvas>
+        <div class="hero__inner">
+          <p class="hero__eyebrow">Yuyang Deng &nbsp;·&nbsp; Genomics · Neuroscience</p>
+          <h1 class="hero__title">
+            One strand,<br />
+            <span class="hero__accent">two worlds.</span>
+          </h1>
+          <p class="hero__lede">
+            I'm a Computer Science &amp; Biostatistics student at
+            <strong>UNC Chapel Hill</strong>, working from the single-cell
+            <strong>genome</strong> to the rhythms of the
+            <strong>brain</strong> — following a single thread from the double
+            helix to the waveform.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#research">Explore the research</a>
+            <a class="btn btn--ghost" href="#contact">Get in touch</a>
+          </div>
+        </div>
+        <a class="hero__scroll" href="#about" aria-label="Scroll to content">
+          <span></span>
+        </a>
+      </section>
+
+      <!-- About -->
+      <section class="section about" id="about">
+        <p class="section__kicker">About</p>
+        <h2 class="section__title">From base pairs to brain rhythms</h2>
+        <div class="about__grid">
+          <p class="about__lead">
+            I'm Yuyang Deng — an undergraduate at UNC Chapel Hill pursuing a B.S.
+            in Computer Science and a B.S. in Biostatistics, with a minor in Data
+            Science (expected May 2027).
+          </p>
+          <p class="about__body">
+            My work lives at the seam between two scales of biology: the
+            molecular instructions encoded in the genome, and the electrical
+            choreography those instructions produce in the brain. Across labs at
+            UNC and Duke, I build computational pipelines and machine-learning
+            models that span single-cell epigenetics, neuroimaging-genetics, and
+            the analysis of brain-wave dynamics.
+          </p>
+        </div>
+      </section>
+
+      <!-- Research -->
+      <section class="section research" id="research">
+        <p class="section__kicker">Research focus</p>
+        <h2 class="section__title">Two threads of inquiry</h2>
+
+        <div class="research__grid">
+          <article class="card card--dna">
+            <canvas class="card__canvas" id="dnaCanvas" aria-hidden="true"></canvas>
+            <div class="card__body">
+              <span class="card__tag">The double helix</span>
+              <h3 class="card__title">Genomics &amp; epigenetics</h3>
+              <p class="card__text">
+                Single-cell transcription factors and the human genome — building
+                data imputation and augmentation methods to overcome sparsity in
+                large-scale single-cell data (UNC Lineberger, Jie Lab).
+              </p>
+            </div>
+          </article>
+
+          <article class="card card--wave">
+            <canvas class="card__canvas" id="waveCanvas" aria-hidden="true"></canvas>
+            <div class="card__body">
+              <span class="card__tag">The brain-wave</span>
+              <h3 class="card__title">Neural dynamics &amp; signals</h3>
+              <p class="card__text">
+                Modeling brain-wave activity in TR-PTSD and OCD — computing
+                metrics like MESOR, entropy, and rhythmic amplitude on clinical
+                trial data (Duke School of Medicine, Suthana Lab).
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Experience -->
+      <section class="section experience" id="experience">
+        <p class="section__kicker">Experience</p>
+        <h2 class="section__title">Where I do the work</h2>
+        <ol class="pub__list">
+          <li class="pub">
+            <span class="pub__year">2026</span>
+            <div class="pub__body">
+              <span class="pub__title">Research Technician — UNC Lineberger Comprehensive Cancer Center</span>
+              <p class="pub__authors"><strong>Jie Lab</strong> · Epigenetics &amp; single-cell genomics</p>
+              <p class="pub__venue">
+                Lead a data imputation/augmentation pipeline to solve transcription-factor
+                genome sparsity; compute large-scale ML models in Python/MATLAB/R for
+                metrics such as t-SNE, BW, and UMI on single-cell data.
+              </p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub__year">2025</span>
+            <div class="pub__body">
+              <span class="pub__title">Machine Learning Research Assistant — Duke University School of Medicine</span>
+              <p class="pub__authors"><strong>Suthana Lab</strong> · Computational neuroscience</p>
+              <p class="pub__venue">
+                Neuroscientific research on TR-PTSD and OCD using biostatistical methods;
+                brain-wave metrics (MESOR, entropy, rhythmic amplitude) via PyTorch/MATLAB/R;
+                co-built a Unity VR program (C#) tracking OCD patients' eye-gaze distance.
+              </p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub__year">2025</span>
+            <div class="pub__body">
+              <span class="pub__title">Research Assistant — UNC Gillings School of Global Public Health</span>
+              <p class="pub__authors"><strong>BIG-S2 Research Group</strong> · Neuroimaging-genetics</p>
+              <p class="pub__venue">
+                Processed clinical MRI through MATLAB pipelines; ran parallel jobs (ANTs,
+                AlphaFold3, TBSS) on 100,000+ patients (HABS-HD, MCSA, UK Biobank) for a
+                multimodal neuroimaging-genetic study of Alzheimer's; Python backend for an
+                LLM-powered ADRD Knowledge Graph.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Projects -->
+      <section class="section projects" id="projects">
+        <p class="section__kicker">Projects</p>
+        <h2 class="section__title">Things I've built &amp; explored</h2>
+        <div class="projects__grid">
+          <a class="project" href="#">
+            <span class="project__dot" data-world="both"></span>
+            <h3 class="project__title">Brain-Computer Interface Chip</h3>
+            <p class="project__text">
+              UNC Infinite Brain Group — Verilog/RTL verification for chip testing
+              pipelines, and led the web-dev team building the project site
+              (NodeJS, Tailwind).
+            </p>
+            <span class="project__meta">Hardware · Web · UNC CS</span>
+          </a>
+          <a class="project" href="#">
+            <span class="project__dot" data-world="both"></span>
+            <h3 class="project__title">ADRD Knowledge Graph</h3>
+            <p class="project__text">
+              Python backend for an Alzheimer's knowledge graph that uses LLMs
+              (OpenAI API) to update research datasets across health metadata.
+            </p>
+            <span class="project__meta">LLM · Genomics · 2025</span>
+          </a>
+          <a class="project" href="#">
+            <span class="project__dot" data-world="both"></span>
+            <h3 class="project__title">Alzheimer's Neuroimaging-Genetics</h3>
+            <p class="project__text">
+              Parallel pipelines (ANTs, AlphaFold3, TBSS) on the UNC Longleaf
+              cluster across 100,000+ patient scans for multimodal analysis.
+            </p>
+            <span class="project__meta">Neuroimaging · Genetics</span>
+          </a>
+          <a class="project" href="#">
+            <span class="project__dot" data-world="wave"></span>
+            <h3 class="project__title">OCD VR Eye-Gaze Tracking</h3>
+            <p class="project__text">
+              A Unity VR program in C# that tracks OCD patients' eye-gaze distance
+              in real-life scenarios for clinical research.
+            </p>
+            <span class="project__meta">VR · Neuroscience</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Awards -->
+      <section class="section awards" id="awards">
+        <p class="section__kicker">Honors &amp; awards</p>
+        <h2 class="section__title">Recognition</h2>
+        <div class="writing__list">
+          <div class="post post--static">
+            <span class="post__date">Mar 2025</span>
+            <span class="post__title">ASA DataFest at Duke — Best Data Visualization Award</span>
+          </div>
+          <div class="post post--static">
+            <span class="post__date">2023–2025</span>
+            <span class="post__title">UNC Dean's List (FA23, SP24, FA24, SP25, FA25)</span>
+          </div>
+          <div class="post post--static">
+            <span class="post__date">Apr 2022</span>
+            <span class="post__title">British Biology Olympiad (BBO) — Global Gold</span>
+          </div>
+          <div class="post post--static">
+            <span class="post__date">Apr 2022</span>
+            <span class="post__title">USA Biology Olympiad (USABO) — Global Silver</span>
+          </div>
+          <div class="post post--static">
+            <span class="post__date">Jan 2022</span>
+            <span class="post__title">UK Chemistry Olympiad (UKChO) — Global Bronze</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="section contact" id="contact">
+        <p class="section__kicker">Contact</p>
+        <h2 class="section__title">Let's connect the strands</h2>
+        <p class="contact__text">
+          Open to collaborations, conversations, and questions at the
+          intersection of genomics and neuroscience.
+        </p>
+        <div class="contact__links">
+          <a class="btn btn--primary" href="mailto:dyy12@unc.edu">Email (UNC)</a>
+          <a class="btn btn--ghost" href="mailto:dyyjason1212@gmail.com">Email (personal)</a>
+          <a class="btn btn--ghost" href="https://github.com/Gimmick12-DYY" target="_blank" rel="noopener">GitHub</a>
+          <a class="btn btn--ghost" href="https://linkedin.com/in/yuyang-deng-2b53522ab" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> Yuyang Deng</span>
+      <span class="footer__note">DNA &amp; brain-waves, rendered in real time.</span>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>
