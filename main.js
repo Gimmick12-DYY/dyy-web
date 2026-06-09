@@ -363,13 +363,13 @@ function initPageDnaHelix() {
 }
 
 /* ------------------------------------------------------------------ *
- *  BLOG PAGE : clinical ECG monitor trace (right side)
- *  A single clean cardiac trace with sharp QRS spikes and a leading
- *  sweep dot, confined to the right portion to mirror the helix and
- *  keep the heading readable.
+ *  BLOG PAGE : multi-channel EEG brain-wave readout (right side)
+ *  Several stacked EEG channels, each a distinct composite rhythm,
+ *  confined to the right portion to mirror the helix and keep the
+ *  heading readable. Distinct from the home card's centered wave.
  * ------------------------------------------------------------------ */
-function initPageEcg() {
-  const canvas = document.getElementById("pageEcgCanvas");
+function initPageEeg() {
+  const canvas = document.getElementById("pageEegCanvas");
   if (!canvas) return;
   let ctx, W, H;
 
@@ -381,100 +381,68 @@ function initPageEcg() {
 
   let time = 0;
 
-  /* One cardiac cycle, normalised to [-1, 1] (P-QRS-T). */
-  function ecgPulse(p) {
-    if (p < 0.07) return 0.14 * Math.sin((p / 0.07) * Math.PI); // P wave
-    if (p < 0.11) return 0;
-    if (p < 0.13) return -0.18; // Q
-    if (p < 0.15) return 1; // R spike
-    if (p < 0.18) return -0.4; // S
-    if (p < 0.34) return 0;
-    if (p < 0.52) return 0.26 * Math.sin(((p - 0.34) / 0.18) * Math.PI); // T wave
-    return 0;
+  // Each channel has its own frequency mix and drift — like real EEG bands.
+  const channels = [
+    { freqs: [0.018, 0.045, 0.09], speed: 1.2, off: 0.0 },
+    { freqs: [0.012, 0.033, 0.07], speed: 0.9, off: 1.7 },
+    { freqs: [0.022, 0.05, 0.11], speed: 1.5, off: 3.2 },
+    { freqs: [0.015, 0.04, 0.08], speed: 1.05, off: 4.6 },
+  ];
+
+  function eegValue(ch, x, t) {
+    const [f1, f2, f3] = ch.freqs;
+    return (
+      0.6 * Math.sin(x * f1 - t * ch.speed + ch.off) +
+      0.28 * Math.sin(x * f2 + t * ch.speed * 0.8 + ch.off) +
+      0.16 * Math.sin(x * f3 - t * ch.speed * 1.6 + ch.off)
+    );
   }
 
   function frame() {
     time += prefersReducedMotion ? 0 : 0.016;
     ctx.clearRect(0, 0, W, H);
 
-    // Region confined to the right of the header.
     const x0 = W * 0.44;
     const x1 = W * 0.99;
-    const cy = H * 0.5;
-    const amp = Math.min(H * 0.2, 80);
-    const span = x1 - x0;
-    const beatWidth = Math.min(Math.max(span / 2.4, 150), 300);
-    const scroll = time * 130;
+    const top = H * 0.2;
+    const bottom = H * 0.8;
+    const n = channels.length;
+    const rowGap = (bottom - top) / (n - 1);
+    const amp = Math.min(rowGap * 0.42, 30);
+    const scroll = time * 60;
 
-    // Subtle monitor grid, clipped to the trace region.
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(x0, cy - amp * 1.5, span, amp * 3);
-    ctx.clip();
-    ctx.strokeStyle = COLORS.wave2;
-    ctx.globalAlpha = 0.16;
-    ctx.lineWidth = 0.5;
-    const grid = 26;
-    const gridShift = scroll % grid;
-    for (let x = x0 - gridShift; x <= x1; x += grid) {
+    channels.forEach((ch, idx) => {
+      const baseY = top + idx * rowGap;
+
+      // Faint channel baseline.
+      ctx.strokeStyle = COLORS.wave2;
+      ctx.globalAlpha = 0.22;
+      ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.moveTo(x, cy - amp * 1.5);
-      ctx.lineTo(x, cy + amp * 1.5);
+      ctx.moveTo(x0, baseY);
+      ctx.lineTo(x1, baseY);
       ctx.stroke();
-    }
-    for (let y = cy - amp * 1.5; y <= cy + amp * 1.5; y += grid) {
+
+      // The EEG trace for this channel.
+      ctx.strokeStyle = idx % 2 === 0 ? COLORS.wave : COLORS.dna2;
+      ctx.globalAlpha = 0.85;
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
       ctx.beginPath();
-      ctx.moveTo(x0, y);
-      ctx.lineTo(x1, y);
+      let started = false;
+      for (let x = x0; x <= x1; x += 3) {
+        const y = baseY - eegValue(ch, x + scroll, time) * amp;
+        if (!started) {
+          ctx.moveTo(x, y);
+          started = true;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
       ctx.stroke();
-    }
+    });
     ctx.globalAlpha = 1;
-    ctx.restore();
-
-    // Baseline guide.
-    ctx.strokeStyle = COLORS.wave2;
-    ctx.globalAlpha = 0.4;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x0, cy);
-    ctx.lineTo(x1, cy);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-
-    // Sample the trace once so the line and the sweep dot stay in sync.
-    const pts = [];
-    for (let x = x0; x <= x1; x += 2) {
-      const phase = (((x + scroll) % beatWidth) + beatWidth) % beatWidth / beatWidth;
-      pts.push({ x, y: cy - ecgPulse(phase) * amp });
-    }
-
-    // Faint echo trace behind for depth.
-    ctx.strokeStyle = COLORS.wave;
-    ctx.globalAlpha = 0.18;
-    ctx.lineWidth = 4.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-    ctx.stroke();
-
-    // Main crisp trace.
-    ctx.strokeStyle = COLORS.wave;
-    ctx.globalAlpha = 0.9;
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-
-    // Leading sweep dot at the right edge, like a live monitor.
-    const lead = pts[pts.length - 1];
-    if (lead) {
-      ctx.fillStyle = COLORS.wave;
-      ctx.beginPath();
-      ctx.arc(lead.x, lead.y, 3.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
 
     requestAnimationFrame(frame);
   }
@@ -508,5 +476,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initDnaCard();
   initWaveCard();
   initPageDnaHelix();
-  initPageEcg();
+  initPageEeg();
 });
