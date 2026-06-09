@@ -281,6 +281,172 @@ function initWaveCard() {
   requestAnimationFrame(frame);
 }
 
+/* ------------------------------------------------------------------ *
+ *  PUBLICATIONS PAGE : coiled circular DNA helix (right side)
+ *  Distinct from hero morph and vertical card helix.
+ * ------------------------------------------------------------------ */
+function initPageDnaHelix() {
+  const canvas = document.getElementById("pageDnaCanvas");
+  if (!canvas) return;
+  let ctx, W, H;
+
+  function resize() {
+    ({ ctx, w: W, h: H } = fitCanvas(canvas));
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  let time = 0;
+  const STEPS = 220;
+
+  function frame() {
+    time += prefersReducedMotion ? 0 : 0.008;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W * 0.76;
+    const cy = H * 0.52;
+    const baseR = Math.min(W, H) * 0.26;
+    const coils = 4.5;
+    const strandA = [];
+    const strandB = [];
+
+    for (let i = 0; i <= STEPS; i++) {
+      const t = i / STEPS;
+      const angle = t * Math.PI * 2 * coils + time * 0.6;
+      const wobble = Math.sin(angle * 3 + time) * baseR * 0.08;
+      const r = baseR + wobble;
+
+      const x1 = cx + Math.cos(angle) * r;
+      const y1 = cy + Math.sin(angle) * r * 0.72;
+      const x2 = cx + Math.cos(angle + Math.PI) * r;
+      const y2 = cy + Math.sin(angle + Math.PI) * r * 0.72;
+
+      strandA.push({ x: x1, y: y1, angle });
+      strandB.push({ x: x2, y: y2 });
+    }
+
+    // Base-pair rungs along the coil
+    for (let i = 0; i < strandA.length; i += 5) {
+      const depth = (Math.sin(strandA[i].angle) + 1) / 2;
+      ctx.globalAlpha = 0.12 + depth * 0.22;
+      ctx.strokeStyle = COLORS.dna2;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(strandA[i].x, strandA[i].y);
+      ctx.lineTo(strandB[i].x, strandB[i].y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    drawOpenCurve(ctx, strandA, COLORS.dna, 2.2, 0.55);
+    drawOpenCurve(ctx, strandB, COLORS.dna2, 2, 0.45);
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+/* ------------------------------------------------------------------ *
+ *  BLOG PAGE : clinical ECG monitor trace
+ *  Sharp QRS spikes — distinct from smooth brain-wave motifs.
+ * ------------------------------------------------------------------ */
+function initPageEcg() {
+  const canvas = document.getElementById("pageEcgCanvas");
+  if (!canvas) return;
+  let ctx, W, H;
+
+  function resize() {
+    ({ ctx, w: W, h: H } = fitCanvas(canvas));
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  let time = 0;
+
+  /* One cardiac cycle, normalised to [-1, 1]. */
+  function ecgPulse(p) {
+    if (p < 0.07) return 0.12 * Math.sin((p / 0.07) * Math.PI);
+    if (p < 0.11) return 0;
+    if (p < 0.13) return -0.18;
+    if (p < 0.145) return 1;
+    if (p < 0.165) return -0.35;
+    if (p < 0.34) return 0;
+    if (p < 0.5) return 0.22 * Math.sin(((p - 0.34) / 0.16) * Math.PI);
+    return 0;
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = COLORS.wave2;
+    ctx.globalAlpha = 0.18;
+    ctx.lineWidth = 0.5;
+    const grid = 28;
+    for (let x = 0; x <= W; x += grid) {
+      ctx.beginPath();
+      ctx.moveTo(x, H * 0.35);
+      ctx.lineTo(x, H * 0.92);
+      ctx.stroke();
+    }
+    for (let y = H * 0.35; y <= H * 0.92; y += grid) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawTrace(yBase, amp, speed, beatWidth, alpha, width) {
+    ctx.strokeStyle = COLORS.wave;
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 2) {
+      const phase = ((x + time * speed * 120) % beatWidth) / beatWidth;
+      const y = yBase + ecgPulse(phase) * amp;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function frame() {
+    time += prefersReducedMotion ? 0 : 0.016;
+    ctx.clearRect(0, 0, W, H);
+
+    drawGrid();
+
+    const amp = Math.min(H * 0.11, 48);
+    drawTrace(H * 0.52, amp, 1.4, 220, 0.7, 2.2);
+    drawTrace(H * 0.72, amp * 0.55, 1.1, 260, 0.35, 1.5);
+    drawTrace(H * 0.86, amp * 0.38, 0.85, 300, 0.22, 1.2);
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+function drawOpenCurve(ctx, pts, color, width, alpha) {
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length - 1; i++) {
+    const xc = (pts[i].x + pts[i + 1].x) / 2;
+    const yc = (pts[i].y + pts[i + 1].y) / 2;
+    ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
 /* ------------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
@@ -289,4 +455,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initHero();
   initDnaCard();
   initWaveCard();
+  initPageDnaHelix();
+  initPageEcg();
 });
