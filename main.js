@@ -282,8 +282,10 @@ function initWaveCard() {
 }
 
 /* ------------------------------------------------------------------ *
- *  PUBLICATIONS PAGE : coiled circular DNA helix (right side)
- *  Distinct from hero morph and vertical card helix.
+ *  PUBLICATIONS PAGE : classic horizontal double-helix (right side)
+ *  A clear DNA ladder twisting along the x-axis, with base-pair rungs
+ *  and depth shading. Distinct from the hero morph and the vertical
+ *  card helix.
  * ------------------------------------------------------------------ */
 function initPageDnaHelix() {
   const canvas = document.getElementById("pageDnaCanvas");
@@ -297,49 +299,62 @@ function initPageDnaHelix() {
   window.addEventListener("resize", resize);
 
   let time = 0;
-  const STEPS = 220;
+  const STEP = 4;
 
   function frame() {
-    time += prefersReducedMotion ? 0 : 0.008;
+    time += prefersReducedMotion ? 0 : 0.014;
     ctx.clearRect(0, 0, W, H);
 
-    const cx = W * 0.76;
-    const cy = H * 0.52;
-    const baseR = Math.min(W, H) * 0.26;
-    const coils = 4.5;
+    // Helix spans the right portion of the header.
+    const startX = W * 0.46;
+    const endX = W * 0.98;
+    const cy = H * 0.5;
+    const amp = Math.min(H * 0.24, 92);
+    const freq = 0.024; // tightness of the twist
+
     const strandA = [];
     const strandB = [];
-
-    for (let i = 0; i <= STEPS; i++) {
-      const t = i / STEPS;
-      const angle = t * Math.PI * 2 * coils + time * 0.6;
-      const wobble = Math.sin(angle * 3 + time) * baseR * 0.08;
-      const r = baseR + wobble;
-
-      const x1 = cx + Math.cos(angle) * r;
-      const y1 = cy + Math.sin(angle) * r * 0.72;
-      const x2 = cx + Math.cos(angle + Math.PI) * r;
-      const y2 = cy + Math.sin(angle + Math.PI) * r * 0.72;
-
-      strandA.push({ x: x1, y: y1, angle });
-      strandB.push({ x: x2, y: y2 });
+    for (let x = startX; x <= endX; x += STEP) {
+      const phase = x * freq - time * 1.5;
+      strandA.push({ x, y: cy + Math.sin(phase) * amp, phase });
+      strandB.push({ x, y: cy + Math.sin(phase + Math.PI) * amp });
     }
 
-    // Base-pair rungs along the coil
-    for (let i = 0; i < strandA.length; i += 5) {
-      const depth = (Math.sin(strandA[i].angle) + 1) / 2;
-      ctx.globalAlpha = 0.12 + depth * 0.22;
-      ctx.strokeStyle = COLORS.dna2;
-      ctx.lineWidth = 1;
+    // Base-pair rungs — draw behind, fade with depth so the twist reads.
+    for (let i = 0; i < strandA.length; i += 4) {
+      const a = strandA[i];
+      const b = strandB[i];
+      const depth = Math.cos(a.phase); // -1 (back) .. 1 (front)
+      const alpha = 0.12 + (depth + 1) / 2 * 0.32;
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+      grad.addColorStop(0, COLORS.dna);
+      grad.addColorStop(1, COLORS.dna2);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.3;
       ctx.beginPath();
-      ctx.moveTo(strandA[i].x, strandA[i].y);
-      ctx.lineTo(strandB[i].x, strandB[i].y);
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
 
-    drawOpenCurve(ctx, strandA, COLORS.dna, 2.2, 0.55);
-    drawOpenCurve(ctx, strandB, COLORS.dna2, 2, 0.45);
+    drawOpenCurve(ctx, strandA, COLORS.dna, 2.4, 0.85);
+    drawOpenCurve(ctx, strandB, COLORS.dna2, 2.4, 0.6);
+
+    // Nodes on the front-facing crossings for a sense of depth.
+    for (let i = 0; i < strandA.length; i += 4) {
+      const a = strandA[i];
+      const front = Math.sin(a.phase);
+      if (front > 0.55) {
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = COLORS.dna;
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
 
     requestAnimationFrame(frame);
   }
@@ -348,8 +363,10 @@ function initPageDnaHelix() {
 }
 
 /* ------------------------------------------------------------------ *
- *  BLOG PAGE : clinical ECG monitor trace
- *  Sharp QRS spikes — distinct from smooth brain-wave motifs.
+ *  BLOG PAGE : clinical ECG monitor trace (right side)
+ *  A single clean cardiac trace with sharp QRS spikes and a leading
+ *  sweep dot, confined to the right portion to mirror the helix and
+ *  keep the heading readable.
  * ------------------------------------------------------------------ */
 function initPageEcg() {
   const canvas = document.getElementById("pageEcgCanvas");
@@ -364,65 +381,100 @@ function initPageEcg() {
 
   let time = 0;
 
-  /* One cardiac cycle, normalised to [-1, 1]. */
+  /* One cardiac cycle, normalised to [-1, 1] (P-QRS-T). */
   function ecgPulse(p) {
-    if (p < 0.07) return 0.12 * Math.sin((p / 0.07) * Math.PI);
+    if (p < 0.07) return 0.14 * Math.sin((p / 0.07) * Math.PI); // P wave
     if (p < 0.11) return 0;
-    if (p < 0.13) return -0.18;
-    if (p < 0.145) return 1;
-    if (p < 0.165) return -0.35;
+    if (p < 0.13) return -0.18; // Q
+    if (p < 0.15) return 1; // R spike
+    if (p < 0.18) return -0.4; // S
     if (p < 0.34) return 0;
-    if (p < 0.5) return 0.22 * Math.sin(((p - 0.34) / 0.16) * Math.PI);
+    if (p < 0.52) return 0.26 * Math.sin(((p - 0.34) / 0.18) * Math.PI); // T wave
     return 0;
-  }
-
-  function drawGrid() {
-    ctx.strokeStyle = COLORS.wave2;
-    ctx.globalAlpha = 0.18;
-    ctx.lineWidth = 0.5;
-    const grid = 28;
-    for (let x = 0; x <= W; x += grid) {
-      ctx.beginPath();
-      ctx.moveTo(x, H * 0.35);
-      ctx.lineTo(x, H * 0.92);
-      ctx.stroke();
-    }
-    for (let y = H * 0.35; y <= H * 0.92; y += grid) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  function drawTrace(yBase, amp, speed, beatWidth, alpha, width) {
-    ctx.strokeStyle = COLORS.wave;
-    ctx.globalAlpha = alpha;
-    ctx.lineWidth = width;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    for (let x = 0; x <= W; x += 2) {
-      const phase = ((x + time * speed * 120) % beatWidth) / beatWidth;
-      const y = yBase + ecgPulse(phase) * amp;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.globalAlpha = 1;
   }
 
   function frame() {
     time += prefersReducedMotion ? 0 : 0.016;
     ctx.clearRect(0, 0, W, H);
 
-    drawGrid();
+    // Region confined to the right of the header.
+    const x0 = W * 0.44;
+    const x1 = W * 0.99;
+    const cy = H * 0.5;
+    const amp = Math.min(H * 0.2, 80);
+    const span = x1 - x0;
+    const beatWidth = Math.min(Math.max(span / 2.4, 150), 300);
+    const scroll = time * 130;
 
-    const amp = Math.min(H * 0.11, 48);
-    drawTrace(H * 0.52, amp, 1.4, 220, 0.7, 2.2);
-    drawTrace(H * 0.72, amp * 0.55, 1.1, 260, 0.35, 1.5);
-    drawTrace(H * 0.86, amp * 0.38, 0.85, 300, 0.22, 1.2);
+    // Subtle monitor grid, clipped to the trace region.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x0, cy - amp * 1.5, span, amp * 3);
+    ctx.clip();
+    ctx.strokeStyle = COLORS.wave2;
+    ctx.globalAlpha = 0.16;
+    ctx.lineWidth = 0.5;
+    const grid = 26;
+    const gridShift = scroll % grid;
+    for (let x = x0 - gridShift; x <= x1; x += grid) {
+      ctx.beginPath();
+      ctx.moveTo(x, cy - amp * 1.5);
+      ctx.lineTo(x, cy + amp * 1.5);
+      ctx.stroke();
+    }
+    for (let y = cy - amp * 1.5; y <= cy + amp * 1.5; y += grid) {
+      ctx.beginPath();
+      ctx.moveTo(x0, y);
+      ctx.lineTo(x1, y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    // Baseline guide.
+    ctx.strokeStyle = COLORS.wave2;
+    ctx.globalAlpha = 0.4;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x0, cy);
+    ctx.lineTo(x1, cy);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Sample the trace once so the line and the sweep dot stay in sync.
+    const pts = [];
+    for (let x = x0; x <= x1; x += 2) {
+      const phase = (((x + scroll) % beatWidth) + beatWidth) % beatWidth / beatWidth;
+      pts.push({ x, y: cy - ecgPulse(phase) * amp });
+    }
+
+    // Faint echo trace behind for depth.
+    ctx.strokeStyle = COLORS.wave;
+    ctx.globalAlpha = 0.18;
+    ctx.lineWidth = 4.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    ctx.stroke();
+
+    // Main crisp trace.
+    ctx.strokeStyle = COLORS.wave;
+    ctx.globalAlpha = 0.9;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Leading sweep dot at the right edge, like a live monitor.
+    const lead = pts[pts.length - 1];
+    if (lead) {
+      ctx.fillStyle = COLORS.wave;
+      ctx.beginPath();
+      ctx.arc(lead.x, lead.y, 3.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     requestAnimationFrame(frame);
   }
