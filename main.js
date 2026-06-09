@@ -356,6 +356,8 @@ function initPageDnaHelix() {
     }
     ctx.globalAlpha = 1;
 
+    fadeHeaderEdges(ctx, W, H, startX, W * 0.2);
+
     requestAnimationFrame(frame);
   }
 
@@ -444,10 +446,45 @@ function initPageEeg() {
     });
     ctx.globalAlpha = 1;
 
+    fadeHeaderEdges(ctx, W, H, x0, W * 0.2);
+
     requestAnimationFrame(frame);
   }
 
   requestAnimationFrame(frame);
+}
+
+/* Softly dissolve the left edge of a header canvas so the art fades
+ * into the title text instead of ending in a hard vertical line.
+ * Also feathers the top and bottom edges. */
+function fadeHeaderEdges(ctx, W, H, fadeStartX, fadeWidth) {
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
+
+  // Left → right horizontal fade.
+  const gx = ctx.createLinearGradient(fadeStartX, 0, fadeStartX + fadeWidth, 0);
+  gx.addColorStop(0, "rgba(0,0,0,1)");
+  gx.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = gx;
+  ctx.fillRect(0, 0, fadeStartX + fadeWidth, H);
+
+  // Top feather.
+  const topH = H * 0.16;
+  const gt = ctx.createLinearGradient(0, 0, 0, topH);
+  gt.addColorStop(0, "rgba(0,0,0,1)");
+  gt.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = gt;
+  ctx.fillRect(0, 0, W, topH);
+
+  // Bottom feather.
+  const botH = H * 0.16;
+  const gb = ctx.createLinearGradient(0, H - botH, 0, H);
+  gb.addColorStop(0, "rgba(0,0,0,0)");
+  gb.addColorStop(1, "rgba(0,0,0,1)");
+  ctx.fillStyle = gb;
+  ctx.fillRect(0, H - botH, W, botH);
+
+  ctx.restore();
 }
 
 function drawOpenCurve(ctx, pts, color, width, alpha) {
