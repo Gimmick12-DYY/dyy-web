@@ -27,7 +27,8 @@ python3 -m http.server 8000
 
 ## Sections
 
-Hero → About → Research → Experience → Projects → Awards → Contact.
+Hero → About → Research → Experience → Projects → Publications → Awards → Blog → Contact.
+`publications.html` is the full publications page.
 The nav links to each. `cv.pdf` is the downloadable resume (replace to update).
 
 ## Customize
