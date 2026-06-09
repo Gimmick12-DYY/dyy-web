@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog · Yuyang Deng</title>
+    <meta
+      name="description"
+      content="Notes and essays by Yuyang Deng on genomics, neuroscience, and research."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="nav__brand" href="index.html" aria-label="Home">
+        <span class="nav__mark" aria-hidden="true"></span>
+        <span class="nav__initials">Yuyang Deng</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="index.html#about">About</a>
+        <a href="index.html#research">Research</a>
+        <a href="index.html#experience">Experience</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="publications.html">Publications</a>
+        <a href="blog.html" aria-current="page">Blog</a>
+        <a href="index.html#contact">Contact</a>
+        <a class="nav__cv" href="cv.pdf" target="_blank" rel="noopener">CV</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-header">
+        <p class="section__kicker">Blog</p>
+        <h1 class="page-header__title">Notes &amp; essays</h1>
+        <p class="page-header__lede">
+          Thoughts on research, code, and the space between genomics and the brain.
+        </p>
+      </section>
+
+      <section class="section blog-page">
+        <div class="writing__list">
+          <a class="post" href="#">
+            <span class="post__date">Jun 2026</span>
+            <div class="post__content">
+              <span class="post__title">From base pairs to brain rhythms</span>
+              <span class="post__excerpt">
+                Why I work at the intersection of the genome and neural signals —
+                and what a single strand can teach us about both.
+              </span>
+            </div>
+            <span class="post__arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="post" href="#">
+            <span class="post__date">May 2026</span>
+            <div class="post__content">
+              <span class="post__title">Pipelines on Longleaf</span>
+              <span class="post__excerpt">
+                Running neuroimaging-genetics jobs at scale — ANTs, AlphaFold3,
+                and what 100,000 patient scans actually look like in practice.
+              </span>
+            </div>
+            <span class="post__arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> Yuyang Deng</span>
+      <a class="footer__back" href="index.html">← Back to home</a>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>

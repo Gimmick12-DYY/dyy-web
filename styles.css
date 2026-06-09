@@ -463,7 +463,8 @@ a.pub__title:hover {
   line-height: 1.65;
 }
 
-.publications-page {
+.publications-page,
+.blog-page {
   padding-top: 48px;
 }
 
